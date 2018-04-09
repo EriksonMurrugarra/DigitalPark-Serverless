@@ -1,4 +1,4 @@
-service: digitalpark-courses
+service: digitalpark
 
 frameworkVersion: ">=1.7.0 <2.0.0"
 
@@ -8,4 +8,9 @@ provider:
 
 functions:
   retrieveCoursesCatalog:
-    handler: handler.retrieveCoursesCatalog
+    handler: courses/catalog.handler
+    events:
+      - http:
+          path: /courses-catalog
+          method: get
+
