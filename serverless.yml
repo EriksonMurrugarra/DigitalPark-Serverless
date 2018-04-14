@@ -19,5 +19,11 @@ functions:
       - http:
           path: /course-detail
           method: get
+  retrieveBlogEntries:
+    handler: blog/list.handler
+    events:
+      - http:
+          path: /blog-entries
+          method: get
 
 
