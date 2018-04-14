@@ -13,4 +13,11 @@ functions:
       - http:
           path: /courses-catalog
           method: get
+  retrieveCourseDetail:
+    handler: courses/detail.handler
+    events:
+      - http:
+          path: /course-detail
+          method: get
+
 
