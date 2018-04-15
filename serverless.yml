@@ -7,6 +7,12 @@ provider:
   runtime: nodejs6.10
   environment:
     SLS_STAGE: ${opt:stage, self:provider.stage}
+  iamRoleStatements:
+    - Action:
+      - dynamodb:GetItem
+      - dynamodb:Scan
+      Resource: "arn:aws:dynamodb:us-east-1:470187922491:table/digitalpark-${opt:stage, self:provider.stage}-courses-catalog"
+      Effect: Allow
 
 functions:
   retrieveCoursesCatalog:
@@ -40,13 +46,13 @@ resources:
       Type: "AWS::DynamoDB::Table"
       Properties:
         AttributeDefinitions:
-          - AttributeName: coursecode
+          - AttributeName: catecode
             AttributeType: S
         KeySchema:
-          - AttributeName: coursecode
+          - AttributeName: catecode
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 2
           WriteCapacityUnits: 2
-        TableName: "${opt:stage, self:provider.stage}-digitalpark"
+        TableName: "digitalpark-${opt:stage, self:provider.stage}-courses-catalog"
       
