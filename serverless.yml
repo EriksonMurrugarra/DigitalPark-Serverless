@@ -5,25 +5,48 @@ frameworkVersion: ">=1.7.0 <2.0.0"
 provider:
   name: aws
   runtime: nodejs6.10
+  environment:
+    SLS_STAGE: ${opt:stage, self:provider.stage}
 
 functions:
   retrieveCoursesCatalog:
     handler: courses/catalog.handler
     events:
       - http:
-          path: /courses-catalog
+          path: /courses
           method: get
+  createCourse:
+    handler: courses/create.handler
+    events:
+      - http:
+          path: /courses
+          method: post
   retrieveCourseDetail:
     handler: courses/detail.handler
     events:
       - http:
-          path: /course-detail
+          path: /courses/{courseId}
           method: get
   retrieveBlogEntries:
     handler: blog/list.handler
     events:
       - http:
-          path: /blog-entries
+          path: /blogs
           method: get
 
-
+resources:
+  Resources:
+    DigitalParkDB:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: coursecode
+            AttributeType: S
+        KeySchema:
+          - AttributeName: coursecode
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 2
+          WriteCapacityUnits: 2
+        TableName: "${opt:stage, self:provider.stage}-digitalpark"
+      
