@@ -1,7 +1,7 @@
 'use strict'
 const AWS = require('aws-sdk');
 
-const tableName = `digitalpark-${process.env.SLS_STAGE}-courses-catalog`;
+const tableName = `${process.env.DPT_COURSES_CATALOG}`;
 const ddb = new AWS.DynamoDB({apiVersion: '2012-10-08'});
 
 module.exports.handler = (event, context, callback) => {

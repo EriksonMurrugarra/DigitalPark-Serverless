@@ -1,17 +1,28 @@
 service: digitalpark
-
 frameworkVersion: ">=1.7.0 <2.0.0"
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  devDynamoCapacity:
+    ReadCapacityUnits: 1
+    WriteCapacityUnits: 1
+  prodDynamoCapacity:
+    ReadCapacityUnits: 5
+    WriteCapacityUnits: 5
 
 provider:
   name: aws
   runtime: nodejs6.10
   environment:
-    SLS_STAGE: ${opt:stage, self:provider.stage}
+    SLS_STAGE: ${self:custom.stage}
+    DPT_COURSES_CATALOG: {Ref: DigitalParkCatalogDB}
+    DPT_COURSES: {Ref: DigitalParkCoursesDB}
+    DPT_BLOG: {Ref: DigitalParkBlogDB}
   iamRoleStatements:
     - Action:
       - dynamodb:GetItem
       - dynamodb:Scan
-      Resource: "arn:aws:dynamodb:us-east-1:470187922491:table/digitalpark-${opt:stage, self:provider.stage}-courses-catalog"
+      Resource: "arn:aws:dynamodb:us-east-1:*:*"
       Effect: Allow
 
 functions:
@@ -42,7 +53,7 @@ functions:
 
 resources:
   Resources:
-    DigitalParkDB:
+    DigitalParkCatalogDB:
       Type: "AWS::DynamoDB::Table"
       Properties:
         AttributeDefinitions:
@@ -51,8 +62,27 @@ resources:
         KeySchema:
           - AttributeName: catecode
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 2
-          WriteCapacityUnits: 2
-        TableName: "digitalpark-${opt:stage, self:provider.stage}-courses-catalog"
-      
+        ProvisionedThroughput: ${self:custom.${self:custom.stage}DynamoCapacity}
+        TableName: "${self:custom.stage}-digitalpark-courses-catalog"
+    DigitalParkCoursesDB:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: coursecode
+            AttributeType: S
+        KeySchema:
+          - AttributeName: coursecode
+            KeyType: HASH
+        ProvisionedThroughput: ${self:custom.${self:custom.stage}DynamoCapacity}
+        TableName: "${self:custom.stage}-digitalpark-courses"
+    DigitalParkBlogDB:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: coursecode
+            AttributeType: S
+        KeySchema:
+          - AttributeName: coursecode
+            KeyType: HASH
+        ProvisionedThroughput: ${self:custom.${self:custom.stage}DynamoCapacity}
+        TableName: "${self:custom.stage}-digitalpark-blog"
